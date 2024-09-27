@@ -5,3 +5,6 @@ draw:
 
 open:
 	open image.ppm
+
+test:
+	cargo test
