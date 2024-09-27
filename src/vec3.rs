@@ -6,6 +6,9 @@ pub struct Vec3 {
     e: [f64;3],
 }
 
+
+pub type Point3 = Vec3;
+
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
         Vec3{ e: [x,y,z]}
@@ -125,6 +128,20 @@ pub fn normalise(u:Vec3) -> Vec3 {
     u / u.length()
 }
 
+
+
+pub fn unit_x() -> Vec3 {
+    Vec3::new(1.0, 0.0, 0.0)
+}
+
+pub fn unit_y() -> Vec3 {
+    Vec3::new(0.0, 1.0, 0.0)
+}
+
+pub fn unit_z() -> Vec3 {
+    Vec3::new(0.0, 0.0, 1.0)
+}
+
 #[cfg(test)]
 mod tests {
     use approx::assert_relative_eq;
@@ -135,15 +152,15 @@ mod tests {
     #[test]
     fn test_vec_unit_length() {
 
-        let v = Vec3::new(1.0,0.0,0.0);
+        let v = unit_x();
         assert_relative_eq!(v.length_squared(), 1.0);
         assert_relative_eq!(v.length(), 1.0);
 
-        let v = Vec3::new(0.0,1.0,0.0);
+        let v = unit_y();
         assert_relative_eq!(v.length_squared(), 1.0);
         assert_relative_eq!(v.length(), 1.0);
 
-        let v = Vec3::new(0.0,0.0,1.0);
+        let v = unit_z();
         assert_relative_eq!(v.length_squared(), 1.0);
         assert_relative_eq!(v.length(), 1.0);
     }
@@ -151,15 +168,15 @@ mod tests {
     #[test]
     fn test_vec_rt2_length() {
 
-        let v = Vec3::new(1.0,1.0,0.0);
+        let v = unit_x() + unit_y();
         assert_relative_eq!(v.length_squared(), 2.0);
         assert_relative_eq!(v.length(), 1.4142135623730951);
 
-        let v = Vec3::new(0.0,1.0,1.0);
+        let v = unit_y() + unit_z();
         assert_relative_eq!(v.length_squared(), 2.0);
         assert_relative_eq!(v.length(), 1.4142135623730951);
 
-        let v = Vec3::new(1.0,0.0,1.0);
+        let v = unit_x() + unit_z();
         assert_relative_eq!(v.length_squared(), 2.0);
         assert_relative_eq!(v.length(), 1.4142135623730951);
     }
@@ -202,8 +219,8 @@ mod tests {
 
     #[test]
     fn test_vec_cross() {
-        let u = Vec3::new(1.0, 0.0, 0.0);
-        let v = Vec3::new(0.0, 1.0, 0.0);
+        let u = unit_x();
+        let v = unit_y();
 
         let w = cross(u, v);
         assert_relative_eq!(0.0, w.x());
@@ -218,7 +235,7 @@ mod tests {
 
     #[test]
     fn test_vec_normalise() {
-        let u = Vec3::new(5.0, 0.0, 0.0);
+        let u = 5.0 * unit_x();
         let v = normalise(u);
         assert_relative_eq!(1.0, v.x());
         assert_relative_eq!(0.0, v.y());
