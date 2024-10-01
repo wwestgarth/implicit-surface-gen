@@ -1,3 +1,4 @@
+use crate::common;
 use std::fmt::{Display, Formatter, Result};
 use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign};
 
@@ -32,6 +33,22 @@ impl Vec3 {
 
     pub fn length_squared(&self) -> f64 {
         (self.x() * self.x()) + (self.y() * self.y()) + (self.z() * self.z())
+    }
+
+    pub fn random() -> Vec3 {
+        Vec3::new(
+            common::random_double(),
+            common::random_double(),
+            common::random_double(),
+        )
+    }
+ 
+    pub fn random_range(min: f64, max: f64) -> Vec3 {
+        Vec3::new(
+            common::random_double_range(min, max),
+            common::random_double_range(min, max),
+            common::random_double_range(min, max),
+        )
     }
 
 }
@@ -140,6 +157,22 @@ pub fn unit_y() -> Vec3 {
 
 pub fn unit_z() -> Vec3 {
     Vec3::new(0.0, 0.0, 1.0)
+}
+
+
+pub fn random_in_unit_sphere() -> Vec3 {
+    // TODO this doesn't seem ideal...
+    loop {
+        let p = Vec3::random_range(-1.0, 1.0);
+        if p.length_squared() >= 1.0 {
+            continue;
+        }
+        return p;
+    }
+}
+
+pub fn random_unit_vector() -> Vec3 {
+    normalise(random_in_unit_sphere())
 }
 
 #[cfg(test)]
