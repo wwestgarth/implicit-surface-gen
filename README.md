@@ -26,13 +26,19 @@ Why do I care? I spent almost a decade working in computation geometry dealing w
 
 # Where I am and where I'm headed
 
-I am currently at Step 0, a dream.
-
-Step 1 build a basic ray tracer:
+Step 1 build a basic ray tracer (COMPLETE):
 I will be using this as an excuse to learn Rust and will start by following the following tutorial to help get something bootstrapped: https://the-ray-tracing-road-to-rust.vercel.app/
 
-Step 2 experiment with sphere tracing:
-As an optimisation sphere tracing can be used to better hone in on the zeros
+This will produce a scene but the ray-tracing is solved analytically as opposed to ray-marching.
+
+Step 2 implement signed-distance ray marching for spheres (IN PROGRESS):
+This will use a basic signed distance function `f(v) = | p - v | - r` where `p` is the centre of the sphere and `r` is its radius
+
+Step 3 build a library of primative signed-distance functions:
+When spheres are working we should be able to trivially implement a set of signed-distance functions for primative surfaces such as torii, cubes.
+
+Step 4 add composibility:
+Boolean and blend operations can be implemented by combining sign-distance functions for implicit surface
 
 Step 3 configurability:
 I'll need a way to either dynamically define the implicit function and feed it into the tracer via a config file and some equation parse
