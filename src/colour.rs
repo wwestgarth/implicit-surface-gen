@@ -1,15 +1,28 @@
 use std::io::Write;
-
+use crate::common;
 use crate::vec3::Vec3;
 
 
 pub type Colour = Vec3;
 
-pub fn write_colour(out: &mut impl Write, pixel: Colour) {
-
-    let r = (255.999 * pixel.x()) as i32;
-    let g = (255.999 * pixel.y()) as i32;
-    let b = (255.999 * pixel.z()) as i32;
-    writeln!(out, "{} {} {}", r, g, b).expect("writing color");
-
+pub fn write_color(out: &mut impl Write, pixel_color: Colour, samples_per_pixel: i32) {
+    let mut r = pixel_color.x();
+    let mut g = pixel_color.y();
+    let mut b = pixel_color.z();
+ 
+    // Divide the color by the number of samples
+    let scale = 1.0 / samples_per_pixel as f64;
+    r *= scale;
+    g *= scale;
+    b *= scale;
+ 
+    // Write the translated [0, 255] value of each color component
+    writeln!(
+        out,
+        "{} {} {}",
+        (256.0 * common::clamp(r, 0.0, 0.999)) as i32,
+        (256.0 * common::clamp(g, 0.0, 0.999)) as i32,
+        (256.0 * common::clamp(b, 0.0, 0.999)) as i32,
+    )
+    .expect("writing color");
 }
