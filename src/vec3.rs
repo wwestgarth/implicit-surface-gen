@@ -4,15 +4,14 @@ use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign};
 
 #[derive(Copy, Clone, Default)]
 pub struct Vec3 {
-    e: [f64;3],
+    e: [f64; 3],
 }
-
 
 pub type Point3 = Vec3;
 
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
-        Vec3{ e: [x,y,z]}
+        Vec3 { e: [x, y, z] }
     }
 
     pub fn x(&self) -> f64 {
@@ -42,7 +41,7 @@ impl Vec3 {
             common::random_double(),
         )
     }
- 
+
     pub fn random_range(min: f64, max: f64) -> Vec3 {
         Vec3::new(
             common::random_double_range(min, max),
@@ -50,11 +49,7 @@ impl Vec3 {
             common::random_double_range(min, max),
         )
     }
-
 }
-
-
-
 
 // Output formatting
 impl Display for Vec3 {
@@ -73,10 +68,9 @@ impl Neg for Vec3 {
 // Vec3 + Vec3
 impl Add for Vec3 {
     type Output = Vec3;
-    fn add(self, v: Vec3) -> Vec3 { 
+    fn add(self, v: Vec3) -> Vec3 {
         Vec3::new(self.x() + v.x(), self.y() + v.y(), self.z() + v.z())
     }
-
 }
 
 impl AddAssign for Vec3 {
@@ -85,10 +79,9 @@ impl AddAssign for Vec3 {
     }
 }
 
-
 impl Sub for Vec3 {
     type Output = Vec3;
- 
+
     fn sub(self, v: Vec3) -> Vec3 {
         Vec3::new(self.x() - v.x(), self.y() - v.y(), self.z() - v.z())
     }
@@ -100,20 +93,19 @@ impl SubAssign for Vec3 {
     }
 }
 
-
 // f64 * Vec3
 impl Mul<Vec3> for f64 {
     type Output = Vec3;
- 
+
     fn mul(self, v: Vec3) -> Vec3 {
         Vec3::new(self * v.x(), self * v.y(), self * v.z())
     }
 }
- 
+
 // Vec3 * f64
 impl Mul<f64> for Vec3 {
     type Output = Vec3;
- 
+
     fn mul(self, t: f64) -> Vec3 {
         Vec3::new(self.x() * t, self.y() * t, self.z() * t)
     }
@@ -121,36 +113,24 @@ impl Mul<f64> for Vec3 {
 
 impl Div<f64> for Vec3 {
     type Output = Vec3;
- 
+
     fn div(self, t: f64) -> Vec3 {
         Vec3::new(self.x() / t, self.y() / t, self.z() / t)
     }
 }
 
-pub fn dot(u:Vec3, v: Vec3) -> f64{
-        u.x() * v.x() +
-        u.y() * v.y() +
-        u.z() * v.z()
+pub fn dot(u: Vec3, v: Vec3) -> f64 {
+    u.x() * v.x() + u.y() * v.y() + u.z() * v.z()
 }
 
-pub fn cross(u:Vec3, v: Vec3) -> Vec3 {
-    Vec3::new(
-        u.y() * v.z() - u.z() * v.y(),
-        u.z() * v.x() - u.x() * v.z(),
-        u.x() * v.y() - u.y() * v.x(),
-    )
-}
-
-pub fn normalise(u:Vec3) -> Vec3 {
+pub fn normalise(u: Vec3) -> Vec3 {
     u / u.length()
 }
 
-pub fn eq(u:Vec3, v:Vec3) -> bool {
+pub fn eq(u: Vec3, v: Vec3) -> bool {
     let tol = 0.001;
     (u - v).length() < tol
 }
-
-
 
 pub fn unit_x() -> Vec3 {
     Vec3::new(1.0, 0.0, 0.0)
@@ -167,7 +147,6 @@ pub fn unit_z() -> Vec3 {
 pub fn origin() -> Vec3 {
     Vec3::new(0.0, 0.0, 0.0)
 }
-
 
 pub fn random_in_unit_sphere() -> Vec3 {
     // TODO this doesn't seem ideal...
@@ -193,7 +172,6 @@ mod tests {
 
     #[test]
     fn test_vec_unit_length() {
-
         let v = unit_x();
         assert_relative_eq!(v.length_squared(), 1.0);
         assert_relative_eq!(v.length(), 1.0);
@@ -209,7 +187,6 @@ mod tests {
 
     #[test]
     fn test_vec_rt2_length() {
-
         let v = unit_x() + unit_y();
         assert_relative_eq!(v.length_squared(), 2.0);
         assert_relative_eq!(v.length(), 1.4142135623730951);
@@ -225,7 +202,6 @@ mod tests {
 
     #[test]
     fn test_vec_neg() {
-
         let v = Vec3::new(1.0, 2.0, 3.0);
         let u = -v;
 
@@ -236,7 +212,6 @@ mod tests {
 
     #[test]
     fn test_vec_add() {
-
         let v = Vec3::new(1.0, 2.0, 3.0);
         let u = Vec3::new(4.0, 5.0, 6.0);
 
@@ -255,24 +230,7 @@ mod tests {
     #[test]
     fn test_vec_dot() {
         let v = Vec3::new(3.0, 4.0, 5.0);
-        assert_relative_eq!(v.length_squared(), dot(v,v));
-    }
-
-
-    #[test]
-    fn test_vec_cross() {
-        let u = unit_x();
-        let v = unit_y();
-
-        let w = cross(u, v);
-        assert_relative_eq!(0.0, w.x());
-        assert_relative_eq!(0.0, w.y());
-        assert_relative_eq!(1.0, w.z());
-
-        let w = cross(v, u);
-        assert_relative_eq!(0.0, w.x());
-        assert_relative_eq!(0.0, w.y());
-        assert_relative_eq!(-1.0, w.z());
+        assert_relative_eq!(v.length_squared(), dot(v, v));
     }
 
     #[test]
@@ -292,5 +250,4 @@ mod tests {
         // to tolerance
         assert_eq!(eq(unit_z(), 1.000001 * unit_z()), true);
     }
-
 }

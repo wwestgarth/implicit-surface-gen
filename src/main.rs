@@ -1,3 +1,4 @@
+mod camera;
 mod colour;
 mod common;
 mod hittable;
@@ -5,26 +6,24 @@ mod hittable_list;
 mod ray;
 mod sphere;
 mod vec3;
-mod camera;
- 
+
 use std::io;
- 
+
+use camera::Camera;
 use colour::Colour;
 use hittable::{HitRecord, Hittable};
 use hittable_list::HittableList;
 use ray::Ray;
 use sphere::Sphere;
-use vec3::{Point3, Vec3};
-use camera::Camera;
- 
-fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Colour {
+use vec3::Point3;
 
+fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Colour {
     if depth <= 0 {
         return Colour::new(0.0, 0.0, 0.0);
     }
 
     let mut rec = HitRecord::new();
-    if world.hit(r, 0.001, common::INFINITY, &mut rec) {
+    if world.hit(r, 0.001, f64::INFINITY, &mut rec) {
         let direction = rec.normal + vec3::random_unit_vector();
         return 0.5 * ray_color(&Ray::new(rec.p, direction), world, depth - 1);
     }
@@ -34,11 +33,7 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Colour {
     (1.0 - t) * Colour::new(1.0, 1.0, 1.0) + t * Colour::new(0.5, 0.7, 1.0)
 }
 
-
-
 fn main() {
-
-
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: i32 = 400;
     const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
@@ -46,17 +41,16 @@ fn main() {
     const MAX_DEPTH: i32 = 10;
 
     // World
- 
+
     let mut world = HittableList::new();
     world.add(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
     world.add(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
 
     // Camera
- 
+
     let cam = Camera::new();
 
     print!("P3\n{} {}\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
-
 
     for j in (0..IMAGE_HEIGHT).rev() {
         eprint!("\rScanlines remaining {}", j);
@@ -73,5 +67,4 @@ fn main() {
     }
 
     eprint!("\nDone!\n")
-
 }

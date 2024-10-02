@@ -1,6 +1,6 @@
 use crate::ray::Ray;
 use crate::vec3::{self, Point3, Vec3};
- 
+
 #[derive(Clone, Default)]
 pub struct HitRecord {
     pub p: Point3,
@@ -8,7 +8,7 @@ pub struct HitRecord {
     pub t: f64,
     pub front_face: bool,
 }
- 
+
 impl HitRecord {
     pub fn new() -> HitRecord {
         Default::default()
@@ -23,11 +23,10 @@ impl HitRecord {
         };
     }
 }
- 
+
 pub trait Hittable {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool;
 }
-
 
 pub trait ImplicitSurface {
     // returns the signed distance from v to the implicit surface
@@ -35,4 +34,3 @@ pub trait ImplicitSurface {
     // returns the gradient of the distance function at v
     fn gradient(&self, v: Vec3) -> Vec3;
 }
-

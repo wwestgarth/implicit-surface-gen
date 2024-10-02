@@ -1,13 +1,13 @@
 use crate::hittable::{HitRecord, Hittable, ImplicitSurface};
 use crate::ray::Ray;
 use crate::vec3::{self, Point3, Vec3};
- 
+
 #[derive(Copy, Clone, Default)]
 pub struct Sphere {
     center: Point3,
     radius: f64,
 }
- 
+
 impl Sphere {
     pub fn new(cen: Point3, r: f64) -> Sphere {
         Sphere {
@@ -17,24 +17,19 @@ impl Sphere {
     }
 }
 
-
-
 impl ImplicitSurface for Sphere {
     // signed distance function for a sphere is the distance from the centre minus its radius.
     // if v is outside of the sphere it will have a positive value, negative if inside, and
     // 0 if coincident.
-    fn signed_distance(&self, v : Vec3) -> f64 {
+    fn signed_distance(&self, v: Vec3) -> f64 {
         (v - self.center).length() - self.radius
-    } 
+    }
 
     fn gradient(&self, v: Vec3) -> Vec3 {
         v - self.center
     }
-
 }
 
-
- 
 impl Hittable for Sphere {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
         let oc = r.origin() - self.center;
@@ -45,9 +40,9 @@ impl Hittable for Sphere {
         if discriminant < 0.0 {
             return false;
         }
- 
+
         let sqrt_d = f64::sqrt(discriminant);
- 
+
         // Find the nearest root that lies in the acceptable range
         let mut root = (-half_b - sqrt_d) / a;
         if root <= t_min || t_max <= root {
@@ -56,7 +51,7 @@ impl Hittable for Sphere {
                 return false;
             }
         }
- 
+
         rec.t = root;
         rec.p = r.at(rec.t);
         rec.normal = (rec.p - self.center) / self.radius;
@@ -68,9 +63,6 @@ impl Hittable for Sphere {
         true
     }
 }
-
-
-
 
 #[cfg(test)]
 mod tests {
@@ -116,7 +108,6 @@ mod tests {
 
     #[test]
     fn test_sphere_gradient() {
-
         let s = Sphere::new(origin(), 1.0);
 
         let grad = s.gradient(unit_x());
@@ -125,12 +116,10 @@ mod tests {
         assert_relative_eq!(grad.y(), 0.0);
         assert_relative_eq!(grad.z(), 0.0);
 
-
         let grad = s.gradient(unit_x() + unit_y());
 
         assert_relative_eq!(grad.x(), 1.0);
         assert_relative_eq!(grad.y(), 1.0);
         assert_relative_eq!(grad.z(), 0.0);
     }
-
 }
