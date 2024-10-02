@@ -7,6 +7,8 @@ pub struct Ray {
 }
 
 
+const SCALAR_TOL: f64 =  0.0001;
+
 impl Ray {
     pub fn new(o: Point3, d: Vec3) -> Self {
         Ray{
@@ -56,7 +58,7 @@ impl Ray {
 
             // basic: assume out steps are small enough that we kind of hit a 0 when we sign changes,
             // we can refine this later
-            if (d < 0.001) || d.signum() != initial.signum() {
+            if (d < SCALAR_TOL) || d.signum() != initial.signum() {
 
                 rec.t = t;
                 rec.p = v;

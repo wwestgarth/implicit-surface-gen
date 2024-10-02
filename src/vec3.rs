@@ -145,6 +145,11 @@ pub fn normalise(u:Vec3) -> Vec3 {
     u / u.length()
 }
 
+pub fn eq(u:Vec3, v:Vec3) -> bool {
+    let tol = 0.001;
+    (u - v).length() < tol
+}
+
 
 
 pub fn unit_x() -> Vec3 {
@@ -278,4 +283,14 @@ mod tests {
         assert_relative_eq!(0.0, v.y());
         assert_relative_eq!(0.0, v.z());
     }
+
+    #[test]
+    fn test_vec_equal() {
+        assert_eq!(eq(unit_x(), unit_x()), true);
+        assert_eq!(eq(unit_x(), unit_z()), false);
+
+        // to tolerance
+        assert_eq!(eq(unit_z(), 1.000001 * unit_z()), true);
+    }
+
 }
