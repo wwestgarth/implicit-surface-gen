@@ -159,6 +159,10 @@ pub fn unit_z() -> Vec3 {
     Vec3::new(0.0, 0.0, 1.0)
 }
 
+pub fn origin() -> Vec3 {
+    Vec3::new(0.0, 0.0, 0.0)
+}
+
 
 pub fn random_in_unit_sphere() -> Vec3 {
     // TODO this doesn't seem ideal...

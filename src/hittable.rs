@@ -27,3 +27,12 @@ impl HitRecord {
 pub trait Hittable {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool;
 }
+
+
+pub trait ImplicitSurface {
+    // returns the signed distance from v to the implicit surface
+    fn signed_distance(&self, v: Vec3) -> f64;
+    // returns the gradient of the distance function at v
+    fn gradient(&self, v: Vec3) -> Vec3;
+}
+
