@@ -9,13 +9,13 @@ pub struct Ray {
     direction: Vec3,
 }
 
-const SCALAR_TOL: f64 = 0.0001;
+const SCALAR_TOL: f64 = 0.00000001;
 
 impl Ray {
     pub fn new(o: Point3, d: Vec3) -> Self {
         Ray {
             origin: o,
-            direction: d,
+            direction: normalise(d),
         }
     }
 
@@ -31,28 +31,39 @@ impl Ray {
         self.origin + (t * self.direction)
     }
 
-    pub fn trace(&self, su: impl ImplicitSurface, t_min: f64, t_max: f64, rec: &mut HitRecord) {
+    pub fn trace(&self, su: &Box<dyn ImplicitSurface>, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
         // let step along the ray until our distance function changes sign
-        let step = (t_max - t_min) / 10.0;
+
 
         let initial = su.signed_distance(self.at(0.0));
 
-        println!("distance initially {}", initial);
+
+        if initial > t_max {
+            return false;
+        }
+
+        let mut step = initial;
+
+        let mut t = 0.0;
+
+        //println!("distance initially {}", initial);
 
         let mut i = 1;
         loop {
-            let t = i as f64 * step;
+            t += step;
 
             let v = self.at(t);
 
-            println!("stepped to {}", v);
+            //println!("stepped to {}", v);
 
             let d = su.signed_distance(v);
-            println!("distance is {}", d);
+            //println!("distance is {}", d);
+
+            step = d;
 
             // basic: assume out steps are small enough that we kind of hit a 0 when we sign changes,
             // we can refine this later
-            if (d < SCALAR_TOL) || d.signum() != initial.signum() {
+            if d < SCALAR_TOL {
                 rec.t = t;
                 rec.p = v;
 
@@ -61,11 +72,13 @@ impl Ray {
 
                 // convention we have chosen
                 rec.set_face_normal(self, rec.normal);
-                return;
+                //println!("HIT");
+                return true;
             }
 
-            if i > 10 {
-                break;
+            if i > 100 {
+                //println!("MISS");
+                return false
             }
             i += 1;
         }
@@ -127,8 +140,11 @@ mod tests {
         // ray origin at origin pointed along x axis
         let r = Ray::new(origin(), unit_x());
 
+
+        let boxed: Box<dyn ImplicitSurface> = Box::new(sphere);
+
         let mut rec = HitRecord::new();
-        r.trace(sphere, 0 as f64, 10 as f64, &mut rec);
+        r.trace(&boxed, 0 as f64, 10 as f64, &mut rec);
 
         assert_relative_eq!(rec.p.x(), 4.0);
         assert_relative_eq!(rec.p.y(), 0.0);
