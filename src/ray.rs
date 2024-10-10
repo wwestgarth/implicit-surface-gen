@@ -59,6 +59,13 @@ impl Ray {
             let d = su.signed_distance(v);
             //println!("distance is {}", d);
 
+
+            // if we've stepped and the distance has increased, just stop now because we're heading 
+            // in the wrong direction
+            if d > step {
+                return false
+            }
+
             step = d;
 
             // basic: assume out steps are small enough that we kind of hit a 0 when we sign changes,
