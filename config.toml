@@ -1,0 +1,9 @@
+output = "image.ppm"
+
+[view]
+height = 225
+width = 400
+
+[sampling]
+samples_per_pixel = 50
+max_depth = 3

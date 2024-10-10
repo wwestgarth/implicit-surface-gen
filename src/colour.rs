@@ -4,7 +4,7 @@ use std::io::Write;
 
 pub type Colour = Vec3;
 
-pub fn write_color(out: &mut impl Write, pixel_color: Colour, samples_per_pixel: i32) {
+pub fn write_color(out: &mut impl Write, pixel_color: Colour, samples_per_pixel: u64) {
     let mut r = pixel_color.x();
     let mut g = pixel_color.y();
     let mut b = pixel_color.z();

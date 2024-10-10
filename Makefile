@@ -1,7 +1,7 @@
 # Makefile
 
 draw:
-	cargo run --release > image.ppm
+	cargo run --release
 
 open:
 	open image.ppm

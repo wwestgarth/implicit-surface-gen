@@ -6,8 +6,15 @@ mod hittable_list;
 mod ray;
 mod sphere;
 mod vec3;
+use anyhow::Result;
+use clap::Parser;
 
-use std::io;
+mod settings;
+
+use settings::Settings;
+
+use std::fs;
+use std::io::Write;
 
 use camera::Camera;
 use colour::Colour;
@@ -17,8 +24,8 @@ use ray::Ray;
 use sphere::Sphere;
 use vec3::Point3;
 
-fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Colour {
-    if depth <= 0 {
+fn ray_color(r: &Ray, world: &dyn Hittable, depth: u64) -> Colour {
+    if depth == 0 {
         return Colour::new(0.0, 0.0, 0.0);
     }
 
@@ -33,12 +40,13 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Colour {
     (1.0 - t) * Colour::new(1.0, 1.0, 1.0) + t * Colour::new(0.5, 0.7, 1.0)
 }
 
-fn main() {
-    const ASPECT_RATIO: f64 = 16.0 / 9.0;
-    const IMAGE_WIDTH: i32 = 400;
-    const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
-    const SAMPLES_PER_PIXEL: i32 = 100;
-    const MAX_DEPTH: i32 = 10;
+fn main() -> Result<()> {
+    let args = settings::Args::parse();
+
+    let cfg = Settings::new(&args.config)?;
+
+    // let open a file
+    let mut file = fs::File::create(cfg.output)?;
 
     // World
 
@@ -50,21 +58,22 @@ fn main() {
 
     let cam = Camera::new();
 
-    print!("P3\n{} {}\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
+    _ = file.write(format!("P3\n{} {}\n255\n", cfg.view.width, cfg.view.height).as_bytes())?;
 
-    for j in (0..IMAGE_HEIGHT).rev() {
+    let samples_per_pixel = cfg.sampling.samples_per_pixel;
+    for j in (0..cfg.view.height).rev() {
         eprint!("\rScanlines remaining {}", j);
-        for i in 0..IMAGE_WIDTH {
+        for i in 0..cfg.view.width {
             let mut pixel_color = Colour::new(0.0, 0.0, 0.0);
-            for _ in 0..SAMPLES_PER_PIXEL {
-                let u = (i as f64 + common::random_double()) / (IMAGE_WIDTH - 1) as f64;
-                let v = (j as f64 + common::random_double()) / (IMAGE_HEIGHT - 1) as f64;
+            for _ in 0..samples_per_pixel {
+                let u = (i as f64 + common::random_double()) / (cfg.view.width - 1) as f64;
+                let v = (j as f64 + common::random_double()) / (cfg.view.height - 1) as f64;
                 let r = cam.get_ray(u, v);
-                pixel_color += ray_color(&r, &world, MAX_DEPTH);
+                pixel_color += ray_color(&r, &world, cfg.sampling.max_depth);
             }
-            colour::write_color(&mut io::stdout(), pixel_color, SAMPLES_PER_PIXEL);
+            colour::write_color(&mut file, pixel_color, samples_per_pixel);
         }
     }
 
-    eprint!("\nDone!\n")
+    Ok(())
 }

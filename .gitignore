@@ -23,3 +23,5 @@ Cargo.lock
 
 image.ppm
 .DS_store
+
+.vscode/
