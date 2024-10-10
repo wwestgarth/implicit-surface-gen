@@ -129,14 +129,14 @@ mod tests {
         assert_relative_eq!(0.0, at.z());
 
         let at = r.at(0.5);
-        assert_relative_eq!(2.5, at.x());
-        assert_relative_eq!(2.0, at.y());
-        assert_relative_eq!(2.5, at.z());
+        assert_relative_eq!(1.2121320343559643, at.x());
+        assert_relative_eq!(0.282842712474619, at.y());
+        assert_relative_eq!(0.35355339059327373, at.z());
 
         let at = r.at(10.0);
-        assert_relative_eq!(31.0, at.x());
-        assert_relative_eq!(40.0, at.y());
-        assert_relative_eq!(50.0, at.z());
+        assert_relative_eq!(5.242640687119285, at.x());
+        assert_relative_eq!(5.65685424949238, at.y());
+        assert_relative_eq!(7.071067811865475, at.z());
     }
 
     #[test]
