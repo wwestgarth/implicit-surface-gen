@@ -76,7 +76,7 @@ impl Ray {
             iteration -= 1;
         }
 
-        return false;
+        false
     }
 }
 

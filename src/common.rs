@@ -26,5 +26,5 @@ pub fn clamp(x: f64, min: f64, max: f64) -> f64 {
 }
 
 pub fn scalar_zero(u: f64) -> bool {
-    return f64::abs(u) < SCALAR_TOL;
+    f64::abs(u) < SCALAR_TOL
 }

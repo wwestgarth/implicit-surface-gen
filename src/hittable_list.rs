@@ -3,8 +3,8 @@ use crate::ray::Ray;
 
 #[derive(Default)]
 pub struct HittableList {
-    objects: Vec<Box<dyn Hittable>>,
-    objects2: Vec<Box<dyn ImplicitSurface>>,
+    parameteric_surfs: Vec<Box<dyn Hittable>>,
+    implicit_surfs: Vec<Box<dyn ImplicitSurface>>,
 }
 
 impl HittableList {
@@ -13,11 +13,11 @@ impl HittableList {
     }
 
     pub fn add(&mut self, object: Box<dyn Hittable>) {
-        self.objects.push(object);
+        self.parameteric_surfs.push(object);
     }
 
     pub fn add_implicit(&mut self, object: Box<dyn ImplicitSurface>) {
-        self.objects2.push(object);
+        self.implicit_surfs.push(object);
     }
 }
 
@@ -27,7 +27,7 @@ impl HittableList {
         let mut hit_anything = false;
         let mut closest_so_far = t_max;
 
-        for object in &self.objects {
+        for object in &self.parameteric_surfs {
             if object.hit(ray, t_min, closest_so_far, &mut temp_rec) {
                 hit_anything = true;
                 closest_so_far = temp_rec.t;
@@ -35,15 +35,7 @@ impl HittableList {
             }
         }
 
-        hit_anything
-    }
-
-    pub fn hit_implicit(&self, ray: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
-        let mut temp_rec = HitRecord::new();
-        let mut hit_anything = false;
-        let mut closest_so_far = t_max;
-
-        for object in &self.objects2 {
+        for object in &self.implicit_surfs {
             if ray.trace(object, t_min, closest_so_far, &mut temp_rec) {
                 hit_anything = true;
                 closest_so_far = temp_rec.t;
@@ -77,7 +69,7 @@ mod tests {
 
         let mut rec = HitRecord::new();
         let ray = Ray::new(origin(), unit_y());
-        let hit = world.hit_implicit(&ray, 0.0, INFINITY, &mut rec);
+        let hit = world.hit(&ray, 0.0, INFINITY, &mut rec);
 
         assert!(hit);
         assert!(eq(rec.p, expect));
