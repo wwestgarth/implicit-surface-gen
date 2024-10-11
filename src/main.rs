@@ -1,6 +1,7 @@
 mod camera;
 mod colour;
 mod common;
+mod cylinder;
 mod hittable;
 mod hittable_list;
 mod ray;
@@ -18,11 +19,12 @@ use std::io::Write;
 
 use camera::Camera;
 use colour::Colour;
+use cylinder::Cylinder;
 use hittable::HitRecord;
 use hittable_list::HittableList;
 use ray::Ray;
 use sphere::Sphere;
-use vec3::Point3;
+use vec3::{unit_x, unit_y, unit_z, Point3};
 
 fn ray_color(r: &Ray, world: &HittableList, depth: u64) -> Colour {
     if depth == 0 {
@@ -53,7 +55,12 @@ fn main() -> Result<()> {
     let mut world = HittableList::new();
 
     // implictly defined sphere in the middle
-    world.add_implicit(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
+    world.add_implicit(Box::new(Sphere::new(Point3::new(0.0, 0.0, -2.0), 0.75)));
+    world.add_implicit(Box::new(Cylinder::new(
+        Point3::new(0.0, 0.0, -1.0),
+        unit_y(),
+        0.25,
+    )));
 
     // explicitly defined sphere as the floor
     world.add(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
