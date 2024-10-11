@@ -35,14 +35,13 @@ impl Ray {
         su: &Box<dyn ImplicitSurface>,
         t_min: f64,
         t_max: f64,
-        rec: &mut HitRecord,
-    ) -> bool {
+    ) -> Option<HitRecord> {
         let mut t = t_min;
         let mut dist = su.signed_distance(self.at(t));
 
         // if the ray is being fired from the surface we assume no hit since it will be an ray from a reflection
         if scalar_zero(dist) {
-            return false;
+            return None;
         }
 
         let mut iteration = 200;
@@ -54,29 +53,30 @@ impl Ray {
 
             // we've stepped outside of the maximum parameter for the ray
             if t > t_max {
-                return false;
+                return None;
             }
 
             // if we've stepped and the distance has increased, something has gone wrong so we'll just bail for now
             if d > dist {
-                return false;
+                return None;
             }
 
             dist = d;
 
             if scalar_zero(d) {
+                let mut rec = HitRecord::new();
                 rec.t = t;
                 rec.p = v;
 
                 rec.normal = normalise(su.gradient(v));
                 rec.set_face_normal(self, rec.normal);
-                return true;
+                return Some(rec);
             }
 
             iteration -= 1;
         }
 
-        false
+        None
     }
 }
 
@@ -137,8 +137,7 @@ mod tests {
 
         let boxed: Box<dyn ImplicitSurface> = Box::new(sphere);
 
-        let mut rec = HitRecord::new();
-        r.trace(&boxed, 0 as f64, 10 as f64, &mut rec);
+        let rec = r.trace(&boxed, 0 as f64, 10 as f64).unwrap();
 
         assert_relative_eq!(rec.p.x(), 4.0);
         assert_relative_eq!(rec.p.y(), 0.0);

@@ -20,7 +20,6 @@ use std::io::Write;
 use camera::Camera;
 use colour::Colour;
 use cylinder::Cylinder;
-use hittable::HitRecord;
 use hittable_list::HittableList;
 use ray::Ray;
 use sphere::Sphere;
@@ -31,10 +30,12 @@ fn ray_color(r: &Ray, world: &HittableList, depth: u64) -> Colour {
         return Colour::new(0.0, 0.0, 0.0);
     }
 
-    let mut rec = HitRecord::new();
-    if world.hit(r, 0.0, f64::INFINITY, &mut rec) {
-        let direction = rec.normal + (0.5 * vec3::random_unit_vector());
-        return 0.5 * ray_color(&Ray::new(rec.p, direction), world, depth - 1);
+    match world.hit(r, 0.0, f64::INFINITY) {
+        None => {}
+        Some(rec) => {
+            let direction = rec.normal + (0.5 * vec3::random_unit_vector());
+            return 0.5 * ray_color(&Ray::new(rec.p, direction), world, depth - 1);
+        }
     }
 
     let n = vec3::normalise(r.direction());
