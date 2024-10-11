@@ -1,4 +1,5 @@
 use crate::{
+    common::scalar_zero,
     hittable::{HitRecord, ImplicitSurface},
     vec3::{normalise, Point3, Vec3},
 };
@@ -8,8 +9,6 @@ pub struct Ray {
     origin: Point3,
     direction: Vec3,
 }
-
-const SCALAR_TOL: f64 = 0.00000001;
 
 impl Ray {
     pub fn new(o: Point3, d: Vec3) -> Self {
@@ -31,64 +30,53 @@ impl Ray {
         self.origin + (t * self.direction)
     }
 
-    pub fn trace(&self, su: &Box<dyn ImplicitSurface>, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
-        // let step along the ray until our distance function changes sign
+    pub fn trace(
+        &self,
+        su: &Box<dyn ImplicitSurface>,
+        t_min: f64,
+        t_max: f64,
+        rec: &mut HitRecord,
+    ) -> bool {
+        let mut t = t_min;
+        let mut dist = su.signed_distance(self.at(t));
 
-
-        let initial = su.signed_distance(self.at(0.0));
-
-
-        if initial > t_max {
+        // if the ray is being fired from the surface we assume no hit since it will be an ray from a reflection
+        if scalar_zero(dist) {
             return false;
         }
 
-        let mut step = initial;
-
-        let mut t = 0.0;
-
-        //println!("distance initially {}", initial);
-
-        let mut i = 1;
-        loop {
-            t += step;
+        let mut iteration = 200;
+        while iteration > 0 {
+            t += dist;
 
             let v = self.at(t);
-
-            //println!("stepped to {}", v);
-
             let d = su.signed_distance(v);
-            //println!("distance is {}", d);
 
-
-            // if we've stepped and the distance has increased, just stop now because we're heading 
-            // in the wrong direction
-            if d > step {
-                return false
+            // we've stepped outside of the maximum parameter for the ray
+            if t > t_max {
+                return false;
             }
 
-            step = d;
+            // if we've stepped and the distance has increased, something has gone wrong so we'll just bail for now
+            if d > dist {
+                return false;
+            }
 
-            // basic: assume out steps are small enough that we kind of hit a 0 when we sign changes,
-            // we can refine this later
-            if d < SCALAR_TOL {
+            dist = d;
+
+            if scalar_zero(d) {
                 rec.t = t;
                 rec.p = v;
 
-                // TODO normal of signed distance function.....
                 rec.normal = normalise(su.gradient(v));
-
-                // convention we have chosen
                 rec.set_face_normal(self, rec.normal);
-                //println!("HIT");
                 return true;
             }
 
-            if i > 100 {
-                //println!("MISS");
-                return false
-            }
-            i += 1;
+            iteration -= 1;
         }
+
+        return false;
     }
 }
 
@@ -146,7 +134,6 @@ mod tests {
 
         // ray origin at origin pointed along x axis
         let r = Ray::new(origin(), unit_x());
-
 
         let boxed: Box<dyn ImplicitSurface> = Box::new(sphere);
 

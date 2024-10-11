@@ -30,7 +30,7 @@ fn ray_color(r: &Ray, world: &HittableList, depth: u64) -> Colour {
     }
 
     let mut rec = HitRecord::new();
-    if world.hit_implicit(r, 0.001, f64::INFINITY, &mut rec) {
+    if world.hit_implicit(r, 0.0, f64::INFINITY, &mut rec) {
         let direction = rec.normal + (0.5 * vec3::random_unit_vector());
         return 0.5 * ray_color(&Ray::new(rec.p, direction), world, depth - 1);
     }
@@ -53,7 +53,6 @@ fn main() -> Result<()> {
     let mut world = HittableList::new();
     world.add(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
     world.add(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
-
 
     world.add_implicit(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
     world.add_implicit(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
