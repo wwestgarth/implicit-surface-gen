@@ -1,3 +1,5 @@
+use std::borrow::Borrow;
+
 use crate::hittable::{HitRecord, Hittable, ImplicitSurface};
 use crate::ray::Ray;
 
@@ -40,7 +42,7 @@ impl HittableList {
         }
 
         for object in &self.implicit_surfs {
-            match ray.trace(object, t_min, closest_so_far) {
+            match ray.trace(object.borrow(), t_min, closest_so_far) {
                 None => {}
                 Some(trec) => {
                     hit_anything = true;

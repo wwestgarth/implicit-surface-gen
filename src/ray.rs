@@ -30,12 +30,7 @@ impl Ray {
         self.origin + (t * self.direction)
     }
 
-    pub fn trace(
-        &self,
-        su: &Box<dyn ImplicitSurface>,
-        t_min: f64,
-        t_max: f64,
-    ) -> Option<HitRecord> {
+    pub fn trace(&self, su: &dyn ImplicitSurface, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let mut t = t_min;
         let mut dist = su.signed_distance(self.at(t));
 
@@ -135,9 +130,9 @@ mod tests {
         // ray origin at origin pointed along x axis
         let r = Ray::new(origin(), unit_x());
 
-        let boxed: Box<dyn ImplicitSurface> = Box::new(sphere);
+        //let boxed: Box<dyn ImplicitSurface> = Box::new(sphere);
 
-        let rec = r.trace(&boxed, 0 as f64, 10 as f64).unwrap();
+        let rec = r.trace(&sphere, 0 as f64, 10 as f64).unwrap();
 
         assert_relative_eq!(rec.p.x(), 4.0);
         assert_relative_eq!(rec.p.y(), 0.0);
